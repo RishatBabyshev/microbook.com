@@ -19,8 +19,15 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		//$this->load->view('welcome_message');
-		echo "Hello World!";
+		$this->load->helper('url');
+		
+		$data['title'] = 'Welcome to C++';
+		$this->load->view('header',$data);	
+	
+		
+		$this->load->view('welcome_message');
+		
+		$this->load->view('footer');	
 	}
 }
 
