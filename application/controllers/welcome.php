@@ -19,16 +19,49 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
+		$this->load->model("Microbook_model");
 		$this->load->helper('url');
-		
 		$data['title'] = 'Welcome to C++';
-		$this->load->view('header',$data);	
-	
 		
-		$this->load->view('welcome_message');
+		$lang = "en";
+		
+	
+		$a = $this->Microbook_model->getListOfCategories();
+		$data_a['lang'] = $lang;
+		$data_a['menus'] = $a;
+		foreach($a as $b):
+			$data_a['article'.$b->id] = $this->Microbook_model->getListOfArticles($b->id, $lang);
+		endforeach;
+
+		$data['lang'] = $lang;	
+
+		
+		$this->load->view('header',$data);
+		
+		$this->load->view('welcome_message', $data_a);
 		
 		$this->load->view('footer');	
 	}
+
+	public function lang($lang)
+	{
+		$this->load->model("Microbook_model");
+		$this->load->helper('url');
+		$data['title'] = 'Welcome to C++';
+		$this->load->view('header',$data);	
+	
+		$a = $this->Microbook_model->getListOfCategories();
+		$data_a['lang'] = $lang;
+		$data_a['menus'] = $a;
+		foreach($a as $b):
+			$data_a['article'.$b->id] = $this->Microbook_model->getListOfArticles($b->id, $lang);
+		endforeach;
+		
+		$this->load->view('welcome_message', $data_a);
+		
+		$this->load->view('footer');	
+	}
+	
 }
 
 /* End of file welcome.php */

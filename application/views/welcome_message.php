@@ -1,12 +1,16 @@
-
-	<div id="body">
-		<p>The page you are looking at is being generated dynamically by CodeIgniter.</p>
-
-		<p>If you would like to edit this page you'll find it located at:</p>
-		<code>application/views/welcome_message.php</code>
-
-		<p>The corresponding controller for this page is found at:</p>
-		<code>application/controllers/welcome.php</code>
-
-		<p>If you are exploring CodeIgniter for the very first time, you should start by reading the <a href="user_guide/">User Guide</a>.</p>
+<td>
+<div id="body">
+	<div style="float:left; margin:10px;">
+		<?php foreach ($menus as $menu): ?>
+			<h3><?php echo $menu->{"name_".$lang};?></h3>
+			<ul>
+				<?php foreach (${"article".$menu->id} as $sub_menu): ?>
+					<li>
+						<a href="<?php echo site_url(('article/id/'.$sub_menu->id.'/'.$lang)); ?>"><?php echo $sub_menu->name; ?></a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endforeach; ?>
 	</div>
+</div>
+</td>

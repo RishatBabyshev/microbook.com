@@ -43,7 +43,6 @@ code {
 
 #header {
 	border-bottom: 1px solid #D0D0D0;
-	
 	height:130px;
 	width:100%;
 }
@@ -65,6 +64,29 @@ code {
 #body{
 	margin: 0 15px 0 15px;
 	background-color:#FFFFFF;
+}
+
+#content {
+	margin: 10px 15px 0 15px;
+	background-color:#FFFFFF;
+}
+
+table tr td{
+	text-align:left;
+	vertical-align:top;
+}
+
+#left_panel {
+	float:left;
+}
+
+#right_panel {
+	border-left:1px solid #D0D0D0;
+	float:left;
+}
+
+#footer{
+	width:100%;
 }
 
 p.footer{
