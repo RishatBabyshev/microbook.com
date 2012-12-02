@@ -124,16 +124,34 @@ class Admin_model extends CI_Model {
 		$sql_ru = "UPDATE article_ru SET category_id=".$category_id." WHERE id =".$id.";";
 		$sql_kz = "UPDATE article_kz SET category_id=".$category_id." WHERE id =".$id.";";
 		$query = $this->db->query( $sql, array($name, $definition, $example, $task, $category_id, $my_order) );
-		$query = $this->db->query( $sql_en );
-		$query = $this->db->query( $sql_ru );
-		$query = $this->db->query( $sql_kz );
+		$query_en = $this->db->query( $sql_en );
+		$query_ru = $this->db->query( $sql_ru );
+		$query_kz = $this->db->query( $sql_kz );
 		return true;
 		
 	}
 	
 	function sortasc($category_id) {
 		$this->load->database();
-			
+		
+		$sql =  "SELECT * FROM article_en ".
+				"WHERE category_id=".$category_id." ".
+				"ORDER BY my_order ASC";
+		
+		$query = $this->db->query($sql);
+		
+		$count = 1;
+		foreach ($query->result() as $row) {
+			$sql_en = "UPDATE article_en SET my_order=".$count." WHERE id =".$row->id.";";
+		    $sql_ru = "UPDATE article_ru SET my_order=".$count." WHERE id =".$row->id.";";
+			$sql_kz = "UPDATE article_kz SET my_order=".$count." WHERE id =".$row->id.";";
+		   
+			$query_en = $this->db->query( $sql_en );
+			$query_ru = $this->db->query( $sql_ru );
+			$query_kz = $this->db->query( $sql_kz );
+			$count = $count + 1;
+		}
+		return true;
 	}
 	
 }

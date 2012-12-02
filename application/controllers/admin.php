@@ -159,6 +159,7 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
+			// Take new posted information
 			$id = $this->input->post('id');
 			$name = $this->input->post('name');
 			$category_id = $this->input->post('category');
@@ -166,28 +167,36 @@ class Admin extends CI_Controller {
 			$example = $this->input->post('example');
 			$task = $this->input->post('task');
 			
-			$article = $this->Admin_model->getArticle($id, $lang);
-			
-			$my_order = $article->my_order;
-			$category_id_a = $article->category->id;
-			
-			if($category_id!=$category_id_a) {
-				$my_order = $this->Admin_model->getAmountOfArticlesInCategory($category_id)+1;
-				$this->Admin_model->sortasc($category_id_a);
-			}
-			
 			$data = NULL;
 			
 			if($name==""){
-				$this->output->set_header('Location: '.site_url('admin/article_add?error=name'));
+				$this->output->set_header('Location: '.site_url('admin/article_edit/'.$id.'/'.$lang.'?error=name'));
 			}
 			else if($category_id=="") {
-				$this->output->set_header('Location: '.site_url('admin/article_add?error=category'));
+				$this->output->set_header('Location: '.site_url('admin/article_edit/'.$id.'/'.$lang.'?error=category'));
 			}
 			else{
-				$this->Admin_model->editArticle($id, $name, $category_id, $definition, $example, $task, $my_order, $lang);
+				// Get article information
+				$article = $this->Admin_model->getArticle($id, $lang);
+				
+				// Get order
+				$my_order = $article->my_order;
+
+				// Get Category
+				$category_id_a = $article->category_id;
+				
+				// If categories are different 
+				if($category_id!=$category_id_a) {
+					$my_order = $this->Admin_model->getAmountOfArticlesInCategory($category_id)+1;
+					$this->Admin_model->editArticle($id, $name, $category_id, $definition, $example, $task, $my_order, $lang);
+					$reorder = $this->Admin_model->sortasc($category_id_a);
+				}
+				else {
+					$this->Admin_model->editArticle($id, $name, $category_id, $definition, $example, $task, $my_order, $lang);	
+				}
+				
 				$this->output->set_header('Location: '.site_url('admin/article_list'));
-			}		
+			}
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
