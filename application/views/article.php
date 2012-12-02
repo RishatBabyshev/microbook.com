@@ -1,4 +1,4 @@
-<td width="80%">
+﻿<td width="80%">
 <div id="right_panel">
 	<div style="width:100%; margin:10px;">
 		<h2><?php echo $article->name; ?></h2><br />
@@ -15,7 +15,6 @@
 		<?php if($next!=null) { ?>
 			<a href="<?php echo $next; ?>">next</a>
 		<?php } ?>
-		
 	</div>
 </div>
 </td>

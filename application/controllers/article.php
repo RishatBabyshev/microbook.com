@@ -10,7 +10,7 @@ class Article extends CI_Controller {
 		$this->load->helper('url');
 		$data['article'] = $this->Microbook_model->getArticle($article_id, $lang);
 		
-		$article_order =  $data['article']->my_order." ";
+		$article_order =  $data['article']->my_order;
 		$category_id =  $data['article']->category_id;
 		$category = $this->Microbook_model->getCategory($category_id);
 		$category_order = $category->my_order;
