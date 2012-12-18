@@ -131,6 +131,28 @@ class Admin_model extends CI_Model {
 		
 	}
 	
+	function deleteArticle($id){
+		$this->load->database();
+		$sql_en = "DELETE ".
+				"FROM article_en ". 
+				"WHERE id=".$id.";";
+		$sql_ru = "DELETE ".
+				"FROM article_ru ". 
+				"WHERE id=".$id.";";
+		$sql_kz = "DELETE ".
+				"FROM article_kz ". 
+				"WHERE id=".$id.";";
+		
+		$query_en = $this->db->query( $sql_en );
+		$query_ru = $this->db->query( $sql_ru );
+		$query_kz = $this->db->query( $sql_kz );
+		
+		return true;
+	}
+	
+	/*
+		Function that assort articles in category
+	*/
 	function sortasc($category_id) {
 		$this->load->database();
 		

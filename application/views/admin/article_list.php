@@ -42,7 +42,7 @@
 				<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/ru');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(ru)</a>
 				<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/kz');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(kz)</a>
 			</td>
-            <td><a href="#"><img src="<?php echo base_url();?>images/trash.gif" alt="" title="" border="0" /></a></td>
+            <td><a href="<?php echo site_url('admin/article_delete/'.$article->id);?>"><img src="<?php echo base_url();?>images/trash.gif" alt="" title="" border="0" /></a></td>
         </tr>
 	<?php endforeach; ?>
     </tbody>

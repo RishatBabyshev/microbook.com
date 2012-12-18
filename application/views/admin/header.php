@@ -4,7 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Panelo - Free Admin Template</title>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url();?>stylesheet/admin-style.css" />
-<link href='http://fonts.googleapis.com/css?family=Belgrano' rel='stylesheet' type='text/css'>
 <!-- jQuery file -->
 <script src="<?php echo base_url();?>js/jquery.min.js"></script>
 <script src="<?php echo base_url();?>js/jquery.tabify.js" type="text/javascript" charset="utf-8"></script>

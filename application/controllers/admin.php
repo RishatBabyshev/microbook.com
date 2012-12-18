@@ -203,4 +203,26 @@ class Admin extends CI_Controller {
 		}
 	}
 	
+	function article_delete($article_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Get article information
+			$article = $this->Admin_model->getArticle($article_id, "en");
+			
+			// Get Category
+			$category_id = $article->category_id;
+			
+			$this->Admin_model->deleteArticle($article_id);
+			$reorder = $this->Admin_model->sortasc($category_id);
+			
+			$this->output->set_header('Location: '.site_url('admin/article_list'));
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
 }

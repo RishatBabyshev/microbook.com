@@ -11,6 +11,13 @@ color:#000;
 	color:red;
 }
 
+@font-face {
+  font-family: 'Belgrano';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Belgrano'), local('Belgrano-Regular'), url(http://themes.googleusercontent.com/static/fonts/belgrano/v3/9nICvxZmkDv7_ninPVYjofesZW2xOQ-xsNqO47m55DA.woff) format('woff');
+}
+
 a{color:#0291d4; text-decoration:none;}
 a#closebt{ position:absolute; top:130px; left:208px; outline:none; z-index:999;}
 a#openbt{ position:absolute; top:130px; left:0px; outline:none; display:none;z-index:999;}
