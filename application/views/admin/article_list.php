@@ -36,7 +36,10 @@
         	<td><!--<input type="checkbox" name="" />--></td>
             <td><?php echo $article->name;?></td>
             <td><?php echo $article->name_en;?></td>
-            <td><?php echo $article->my_order;?> up down </td>
+            <td><?php echo $article->my_order;?> 
+				<a href="<?php echo site_url('admin/article_down/'.$article->id);?>"><img src="<?php echo base_url();?>images/up.gif" width="15" height="15"/></a>  
+				<a href="<?php echo site_url('admin/article_up/'.$article->id);?>"><img src="<?php echo base_url();?>images/down.gif" width="15" height="15"/></a>
+			</td>
             <td><a href="<?php echo site_url('admin/article_edit/'.$article->id.'/en');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(en)</a></td>
             <td>
 				<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/ru');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(ru)</a>

@@ -176,5 +176,45 @@ class Admin_model extends CI_Model {
 		return true;
 	}
 	
+	function changeOrderOfArticles($ida, $my_ordera, $idb, $my_orderb) {
+		$this->load->database();
+		
+		$sql_ena = "UPDATE article_en SET my_order=".$my_ordera." WHERE id =".$ida.";";
+		$sql_rua = "UPDATE article_ru SET my_order=".$my_ordera." WHERE id =".$ida.";";
+		$sql_kza = "UPDATE article_kz SET my_order=".$my_ordera." WHERE id =".$ida.";";
+		
+		$sql_enb = "UPDATE article_en SET my_order=".$my_orderb." WHERE id =".$idb.";";
+		$sql_rub = "UPDATE article_ru SET my_order=".$my_orderb." WHERE id =".$idb.";";
+		$sql_kzb = "UPDATE article_kz SET my_order=".$my_orderb." WHERE id =".$idb.";";
+		
+		$query_ena = $this->db->query( $sql_ena );
+		$query_rua = $this->db->query( $sql_rua );
+		$query_kza = $this->db->query( $sql_kza );
+		
+		$query_enb = $this->db->query( $sql_enb );
+		$query_rub = $this->db->query( $sql_rub );
+		$query_kzb = $this->db->query( $sql_kzb );
+		
+		
+		return true;
+	}
+	
+	function getArticleByOrder($order, $category_id) {
+		$this->load->database();
+		
+		$sql = "SELECT * ".
+				"FROM article_en ". 
+				"WHERE my_order=".$order." ".
+				"AND category_id=".$category_id.";";
+		
+		$query = $this->db->query( $sql );
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		}
+		else {
+			return NULL;
+		}
+	}
+	
 }
 ?>

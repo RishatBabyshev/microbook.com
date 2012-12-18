@@ -225,4 +225,67 @@ class Admin extends CI_Controller {
 		}
 	}
 	
+	function article_up($article_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Get article information
+			$article = $this->Admin_model->getArticle($article_id, "en");
+			
+			// Get Category
+			$category_id = $article->category_id;
+			
+			// Get Order
+			$my_order = $article->my_order;
+			
+			// Amount of articles
+			$amount_of_articles = $this->Admin_model->getAmountOfArticlesInCategory($category_id);
+			
+			if($my_order!=$amount_of_articles) {
+				// Another Article
+				$my_order_up = $article->my_order+1;
+				$article_up = $this->Admin_model->getArticleByOrder($my_order_up, $category_id);
+				
+				$this->Admin_model->changeOrderOfArticles($article->id, $my_order_up, $article_up->id, $my_order);
+			}
+			
+			$this->output->set_header('Location: '.site_url('admin/article_list'));		
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function article_down($article_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Get article information
+			$article = $this->Admin_model->getArticle($article_id, "en");
+			
+			// Get Category
+			$category_id = $article->category_id;
+			
+			// Get Order
+			$my_order = $article->my_order;
+			
+			if($my_order!=1) {			
+				// Another Article
+				$my_order_down = $article->my_order-1;
+				$article_down = $this->Admin_model->getArticleByOrder($my_order_down, $category_id);
+				
+				$this->Admin_model->changeOrderOfArticles($article->id, $my_order_down, $article_down->id, $my_order);
+			}
+			
+			$this->output->set_header('Location: '.site_url('admin/article_list'));		
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
 }
