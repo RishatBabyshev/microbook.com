@@ -485,4 +485,53 @@ class Admin extends CI_Controller {
 		}
 	}
 	
+	/* Settings */
+	
+	function settings() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$data['error'] = $this->input->get('error');
+			
+			$settings = $this->Admin_model->getSettings();
+			$data['site_name'] = $settings[0]->name;
+			$data['offline'] = $settings[0]->offline;
+			
+			$header_data['menu'] = "settings";
+			
+			$this->load->view('admin/header',$header_data);	
+			$this->load->view('admin/settings', $data);
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function save_settings() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Take new posted information
+			$site_name = $this->input->post('site_name');
+			$offline = $this->input->post('offline');
+			
+			if($site_name==""){
+				$this->output->set_header('Location: '.site_url('admin/settings?error=site_name'));
+			}
+			else{
+				$this->Admin_model->editSettings($site_name, $offline);	
+				
+				$this->output->set_header('Location: '.site_url('admin/settings'));
+			}
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
 }

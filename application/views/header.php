@@ -25,7 +25,7 @@
 <div id="container">
 	<div id="header">
 		<div id="logo"> <img src="<?php echo base_url(); ?>images/sdufull.png" /> </div>
-		<div id="header-text"><h1>Welcome to C++</h1>
+		<div id="header-text"><h1><?php echo $title; ?></h1>
 			<span style="float:right;">
 				<a href="<?php echo $url."en";?>">en</a>
 				<a href="<?php echo $url."ru";?>">ru</a>

@@ -8,6 +8,18 @@ class Article extends CI_Controller {
 	public function id($article_id, $lang) {
 		$this->load->model("Microbook_model");
 		$this->load->helper('url');
+		
+		
+		/* If Offline */
+		$settings = $this->Microbook_model->getSettings();
+		$data['title'] = $settings[0]->name;
+		$offline = $settings[0]->offline;
+		
+		if($offline){
+			$this->output->set_header('Location: '.site_url('site_offline'));
+		}
+		/* End If Offline */
+		
 		$data['article'] = $this->Microbook_model->getArticle($article_id, $lang);
 		
 		$article_order =  $data['article']->my_order;
@@ -77,7 +89,7 @@ class Article extends CI_Controller {
 		else
 			$data['next'] = NULL;
 			
-		$header_data['title'] = $data['article']->name;
+		$header_data['title'] = $settings[0]->name;
 		$menu_data['lang'] = $lang;
 		$menu_data['menu_category'] = null;
 		

@@ -287,3 +287,19 @@ div.cpanel-right {
 	width: 45%;
 	float: right;
 }
+
+/*---------------------Settings Table-------------------------*/
+.settings-table {
+	
+}
+
+.settings-table tr td {
+	padding:0px 20px;
+}
+
+.settings-table tr td input#site_name {
+	width:200px;
+}
+
+
+

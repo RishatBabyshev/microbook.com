@@ -5,7 +5,16 @@ class Category extends CI_Controller {
 	{
 		$this->load->helper('url');
 		
-		$data['title'] = 'Welcome to C++';
+		/* If Offline */
+		$settings = $this->Microbook_model->getSettings();
+		$data['title'] = $settings[0]->name;
+		$offline = $settings[0]->offline;
+		
+		if($offline){
+			$this->output->set_header('Location: '.site_url('site_offline'));
+		}
+		/* End If Offline */
+		
 		$this->load->view('header',$data);	
 		
 		$this->load->view('footer');	

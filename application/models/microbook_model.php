@@ -132,5 +132,16 @@ class Microbook_model extends CI_Model {
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
+	
+	function getSettings() {
+		$this->load->database();
+		
+		$sql = "SELECT * ".
+				"FROM settings";
+		
+		$query = $this->db->query( $sql );
+		return $query->result();
+	}
+	
 }
 ?>

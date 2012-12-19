@@ -46,7 +46,7 @@
 				</div>
 				<div class="icon-wrapper">
 					<div class="icon">
-						<a href="#">
+						<a href="<?php echo site_url('admin/settings');?>">
 							<img src="<?php echo base_url();?>images/quick-icon/config.png" alt="">
 							<span>Settings</span>
 						</a>

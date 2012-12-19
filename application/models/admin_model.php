@@ -319,6 +319,27 @@ class Admin_model extends CI_Model {
 		return true;
 	}
 	
+	function getSettings() {
+		$this->load->database();
+		
+		$sql = "SELECT * ".
+				"FROM settings";
+		
+		$query = $this->db->query( $sql );
+		return $query->result();
+	}
+	
+	function editSettings($name, $offline) {
+		$this->load->database();
+		
+		$sql = "UPDATE settings
+				SET name = ?, offline = ?
+				WHERE id = 1";
+		
+		$query = $this->db->query( $sql, array($name, $offline));
+		
+		return true;
+	}
 	
 }
 ?>
