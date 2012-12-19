@@ -31,23 +31,27 @@
         </tr>
     </tfoot>
     <tbody>
-	<?php foreach($articles as $article): ?>
-		<tr class="odd">
-        	<td><!--<input type="checkbox" name="" />--></td>
-            <td><?php echo $article->name;?></td>
-            <td><?php echo $article->name_en;?></td>
-            <td><?php echo $article->my_order;?> 
-				<a href="<?php echo site_url('admin/article_down/'.$article->id);?>"><img src="<?php echo base_url();?>images/up.gif" width="15" height="15"/></a>  
-				<a href="<?php echo site_url('admin/article_up/'.$article->id);?>"><img src="<?php echo base_url();?>images/down.gif" width="15" height="15"/></a>
-			</td>
-            <td><a href="<?php echo site_url('admin/article_edit/'.$article->id.'/en');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(en)</a></td>
-            <td>
-				<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/ru');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(ru)</a>
-				<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/kz');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(kz)</a>
-			</td>
-            <td><a href="<?php echo site_url('admin/article_delete/'.$article->id);?>"><img src="<?php echo base_url();?>images/trash.gif" alt="" title="" border="0" /></a></td>
-        </tr>
-	<?php endforeach; ?>
+	<?php if(ISSET($articles)){?>
+		<?php foreach($articles as $article): ?>
+			<tr class="odd">
+				<td><!--<input type="checkbox" name="" />--></td>
+				<td><?php echo $article->name;?></td>
+				<td><?php echo $article->name_en;?></td>
+				<td>( <?php echo $article->my_order;?> )  
+					<a href="<?php echo site_url('admin/article_down/'.$article->id);?>"><img src="<?php echo base_url();?>images/up.gif" width="15" height="15"/></a>  
+					<a href="<?php echo site_url('admin/article_up/'.$article->id);?>"><img src="<?php echo base_url();?>images/down.gif" width="15" height="15"/></a>
+				</td>
+				<td><a href="<?php echo site_url('admin/article_edit/'.$article->id.'/en');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(en)</a></td>
+				<td>
+					<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/ru');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(ru)</a>
+					<a href="<?php echo site_url('admin/article_edit/'.$article->id.'/kz');?>"><img src="<?php echo base_url();?>images/edit.png" alt="" title="" border="0" />(kz)</a>
+				</td>
+				<td><a href="<?php echo site_url('admin/article_delete/'.$article->id);?>"><img src="<?php echo base_url();?>images/trash.gif" alt="" title="" border="0" /></a></td>
+			</tr>
+		<?php endforeach; ?>
+	<?php } else {?>
+		<tr><td colspan="6" style="padding:15px;">No articles</td></tr>
+	<?php }?>
     </tbody>
 </table>
 <!--

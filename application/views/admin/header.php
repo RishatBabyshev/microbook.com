@@ -50,7 +50,7 @@ tinyMCE.init({
     <div class="menu">
     <ul>
     <li><a href="<?php echo site_url('admin/main');?>" <?php if($menu=="main") echo 'class="selected"';?>>Main page</a></li>
-    <li><a href="#" <?php if($menu=="category") echo 'class="selected"';?>>Categories</a></li>
+    <li><a href="<?php echo site_url('admin/category_list');?>" <?php if($menu=="category") echo 'class="selected"';?>>Categories</a></li>
     <li><a href="<?php echo site_url('admin/article_list');?>" <?php if($menu=="article") echo 'class="selected"';?>>Articles</a></li>
     <li><a href="#" <?php if($menu=="user") echo 'class="selected"';?>>Users</a></li>
     <li><a href="#" <?php if($menu=="settings") echo 'class="selected"';?>>Admin settings</a></li>

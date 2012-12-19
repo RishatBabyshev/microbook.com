@@ -6,8 +6,7 @@ class Admin_model extends CI_Model {
         parent::__construct();
     }
 	
-	function check_user($login, $password)
-    {
+	function check_user($login, $password) {
 		$this->load->database();
 		$sql = "SELECT * FROM user WHERE login='".$login."' AND password='".$password."';";
         $query = $this->db->query($sql);
@@ -20,8 +19,7 @@ class Admin_model extends CI_Model {
 		}
     }
 	
-	function check_for_user($login)
-    {
+	function check_for_user($login) {
 		$this->load->database();
 		$sql = "SELECT * FROM user WHERE login='".$login."';";
         $query = $this->db->query($sql);
@@ -52,16 +50,12 @@ class Admin_model extends CI_Model {
 		return $query->num_rows();
 	}
 	
-	function getListOfCategories() {
+	function getAmountOfCategories(){
 		$this->load->database();
-		
-		$sql = "SELECT * ".
-				"FROM category;";
-		
-		$query = $this->db->query($sql);
-		return $query->result();
+		$query = $this->db->query("SELECT * FROM category;");
+		return $query->num_rows();
 	}
-
+	
 	function getArticle($id, $lang){
 		$this->load->database();
 		
@@ -150,32 +144,6 @@ class Admin_model extends CI_Model {
 		return true;
 	}
 	
-	/*
-		Function that assort articles in category
-	*/
-	function sortasc($category_id) {
-		$this->load->database();
-		
-		$sql =  "SELECT * FROM article_en ".
-				"WHERE category_id=".$category_id." ".
-				"ORDER BY my_order ASC";
-		
-		$query = $this->db->query($sql);
-		
-		$count = 1;
-		foreach ($query->result() as $row) {
-			$sql_en = "UPDATE article_en SET my_order=".$count." WHERE id =".$row->id.";";
-		    $sql_ru = "UPDATE article_ru SET my_order=".$count." WHERE id =".$row->id.";";
-			$sql_kz = "UPDATE article_kz SET my_order=".$count." WHERE id =".$row->id.";";
-		   
-			$query_en = $this->db->query( $sql_en );
-			$query_ru = $this->db->query( $sql_ru );
-			$query_kz = $this->db->query( $sql_kz );
-			$count = $count + 1;
-		}
-		return true;
-	}
-	
 	function changeOrderOfArticles($ida, $my_ordera, $idb, $my_orderb) {
 		$this->load->database();
 		
@@ -215,6 +183,142 @@ class Admin_model extends CI_Model {
 			return NULL;
 		}
 	}
+	
+	/* Function that assort articles in category */
+	function sortasc($category_id) {
+		$this->load->database();
+		
+		$sql =  "SELECT * FROM article_en ".
+				"WHERE category_id=".$category_id." ".
+				"ORDER BY my_order ASC";
+		
+		$query = $this->db->query($sql);
+		
+		$count = 1;
+		foreach ($query->result() as $row) {
+			$sql_en = "UPDATE article_en SET my_order=".$count." WHERE id =".$row->id.";";
+		    $sql_ru = "UPDATE article_ru SET my_order=".$count." WHERE id =".$row->id.";";
+			$sql_kz = "UPDATE article_kz SET my_order=".$count." WHERE id =".$row->id.";";
+		   
+			$query_en = $this->db->query( $sql_en );
+			$query_ru = $this->db->query( $sql_ru );
+			$query_kz = $this->db->query( $sql_kz );
+			$count = $count + 1;
+		}
+		return true;
+	}
+	
+	
+	function getListOfCategories() {
+		$this->load->database();
+		
+		$sql = "SELECT * ".
+				"FROM category
+				ORDER BY my_order";
+		
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+	
+	function getCategory($id){
+		$this->load->database();
+		
+		$sql = "SELECT * ".
+				"FROM category ". 
+				"WHERE id=".$id.";";
+		
+		$query = $this->db->query( $sql );
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		}
+		else {
+			return NULL;
+		}
+	}
+	
+	function addCategory($name_en, $name_ru, $name_kz, $my_order) {
+		$this->load->database();
+		
+		$sql = "INSERT INTO category( name_en, name_ru, name_kz, my_order ) 
+				VALUES ( ?, ?, ?, ? );";
+		
+		$query = $this->db->query( $sql, array($name_en, $name_ru, $name_kz, $my_order));
+		
+		return true;
+	}
+	
+	function editCategory($id, $name_en, $name_ru, $name_kz) {
+		$this->load->database();
+		
+		$sql = "UPDATE category  
+				SET name_en = ?, name_ru = ?, name_kz = ?
+				WHERE id =".$id.";";
+		
+		$query = $this->db->query( $sql, array($name_en, $name_ru, $name_kz));
+		
+		return true;
+	}
+	
+	function deleteCategory($id){
+		$this->load->database();
+		
+		$sql = "DELETE ".
+				"FROM category ". 
+				"WHERE id=".$id.";";
+		
+		$query = $this->db->query( $sql );
+		
+		return true;
+	}
+	
+	function changeOrderOfCategories($ida, $my_ordera, $idb, $my_orderb) {
+		$this->load->database();
+		
+		$sql_a = "UPDATE category SET my_order=".$my_ordera." WHERE id =".$ida.";";
+		$sql_b = "UPDATE category SET my_order=".$my_orderb." WHERE id =".$idb.";";
+		
+		$query_a = $this->db->query( $sql_a );
+		$query_b = $this->db->query( $sql_b );
+		
+		return true;
+	}
+	
+	function getCategoryByOrder($order) {
+		$this->load->database();
+		
+		$sql = "SELECT * ".
+				"FROM category ". 
+				"WHERE my_order=".$order.";";
+		
+		$query = $this->db->query( $sql );
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		}
+		else {
+			return NULL;
+		}
+	}
+	
+	/* Function that assort categories */
+	function sortascCategory() {
+		$this->load->database();
+		
+		$sql =  "SELECT * FROM category 
+				ORDER BY my_order ASC";
+		
+		$query = $this->db->query($sql);
+		
+		$count = 1;
+		foreach ($query->result() as $row) {
+			$sql = "UPDATE category SET my_order=".$count." WHERE id =".$row->id.";";
+		    
+			$query = $this->db->query( $sql );
+
+			$count = $count + 1;
+		}
+		return true;
+	}
+	
 	
 }
 ?>

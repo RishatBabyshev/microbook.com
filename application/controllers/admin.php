@@ -44,7 +44,7 @@ class Admin extends CI_Controller {
 		$this->output->set_header('Location: '.base_url());
 	}
 	
-	
+	/* Main */
 	function main() {
 		$this->load->library('session');
 		$this->load->helper('url');
@@ -52,12 +52,14 @@ class Admin extends CI_Controller {
 		if($this->session->userdata('login')) {
 			$header_data['menu'] = "main";
 			$this->load->view('admin/header',$header_data);	
+			$this->load->view('admin/main');
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
 		}
 	}
 	
+	/* Articles */
 	function article_list() {
 		$this->load->library('session');
 		$this->load->helper('url');
@@ -282,6 +284,201 @@ class Admin extends CI_Controller {
 			}
 			
 			$this->output->set_header('Location: '.site_url('admin/article_list'));		
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	/* Categories */
+	
+	function category_list() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$data['categories'] = $this->Admin_model->getListOfCategories();
+			$header_data['menu'] = "category";
+			
+			$this->load->view('admin/header',$header_data);	
+			$this->load->view('admin/category_list',$data);
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+
+	function category_add() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$data['error'] = $this->input->get('error');
+			$data['action'] = "category_addto"; 
+			
+			$header_data['menu'] = "category";
+			
+			$this->load->view('admin/header',$header_data);	
+			$this->load->view('admin/category_add',$data);
+		} else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function category_addto() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			
+			$data = NULL;
+			
+			$name_en = $this->input->post('name_en');
+			$name_ru = $this->input->post('name_ru');
+			$name_kz = $this->input->post('name_kz');
+			
+			$my_order = $this->Admin_model->getAmountOfCategories()+1;
+			
+			if($name_ru=="")$name_ru = $name_en;
+			if($name_kz=="")$name_kz = $name_en;
+			
+			if($name_en==""){
+				$this->output->set_header('Location: '.site_url('admin/category_add?error=name_en'));
+			}
+			else{
+				$this->Admin_model->addCategory($name_en, $name_ru, $name_kz, $my_order);
+				$this->output->set_header('Location: '.site_url('admin/category_list'));
+			}
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function category_edit($category_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$data['error'] = $this->input->get('error');
+			$data['category'] = $this->Admin_model->getCategory($category_id);
+			$data['action'] = "category_editto"; 
+			
+			$header_data['menu'] = "category";
+			
+			$this->load->view('admin/header',$header_data);		
+			$this->load->view('admin/category_add',$data);
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function category_editto() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Take new posted information
+			$id = $this->input->post('id');
+			$name_en = $this->input->post('name_en');
+			$name_ru = $this->input->post('name_ru');
+			$name_kz = $this->input->post('name_kz');
+			
+			$data = NULL;
+			
+			if($name_ru=="")$name_ru = $name_en;
+			if($name_kz=="")$name_kz = $name_en;
+			
+			if($name_en==""){
+				$this->output->set_header('Location: '.site_url('admin/category_edit/'.$id.'?error=name_en'));
+			}
+			else{
+				$this->Admin_model->editCategory($id, $name_en, $name_ru, $name_kz);	
+				
+				$this->output->set_header('Location: '.site_url('admin/category_list'));
+			}
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function category_delete($category_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			$this->Admin_model->deleteCategory($category_id);
+			$reorder = $this->Admin_model->sortascCategory();
+			
+			$this->output->set_header('Location: '.site_url('admin/category_list'));
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+
+	function category_up($category_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Get category information
+			$category = $this->Admin_model->getCategory($category_id);
+			
+			// Get Order
+			$my_order = $category->my_order;
+			
+			// Amount of categories
+			$amount_of_categories = $this->Admin_model->getAmountOfCategories();
+			
+			if($my_order!=$amount_of_categories) {
+				// Another Category
+				$my_order_up = $category->my_order+1;
+				$category_up = $this->Admin_model->getCategoryByOrder($my_order_up);
+				
+				$this->Admin_model->changeOrderOfCategories($category->id, $my_order_up, $category_up->id, $my_order);
+			}
+			
+			$this->output->set_header('Location: '.site_url('admin/category_list'));		
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function category_down($category_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			// Get category information
+			$category = $this->Admin_model->getCategory($category_id);
+			
+			// Get Order
+			$my_order = $category->my_order;
+			
+			if($my_order!=1) {			
+				// Another Category
+				$my_order_down = $category->my_order-1;
+				$category_down = $this->Admin_model->getCategoryByOrder($my_order_down);
+				
+				$this->Admin_model->changeOrderOfCategories($category->id, $my_order_down, $category_down->id, $my_order);
+			}
+			
+			$this->output->set_header('Location: '.site_url('admin/category_list'));		
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
