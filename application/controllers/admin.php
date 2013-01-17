@@ -13,16 +13,26 @@ class Admin extends CI_Controller {
 	function login() {
 		$this->load->library('session');
 		$this->load->model('Admin_model');
+		$this->load->model("User_role_model");
 		$this->load->helper('url');
 		$login = $this->input->post('login');
 		$password = /*md5*/($this->input->post('password'));
 		
 		if($this->Admin_model->check_user($login, $password) !== "-1"){
 			$this->load->library('session');
+			
+			$user_id = $this->Admin_model->check_user($login, $password);
+			$privileges = array();
+			foreach($this->User_role_model->getPriveleges($user_id) as $p):
+				array_push($privileges, $p->name);
+			endforeach;
+			
+			
 			$newdata = array(
                    'login'  => $login,
                    'logged_in' => TRUE,
-				   'login_id'  => $this->Admin_model->check_user($login, $password)
+				   'login_id'  => $user_id,
+				   'privileges' => $privileges
                );
 
 			$this->session->set_userdata($newdata);
@@ -39,6 +49,7 @@ class Admin extends CI_Controller {
 		$this->session->unset_userdata('login');
 		$this->session->unset_userdata('logged_in');
 		$this->session->unset_userdata('login_id');
+		$this->session->unset_userdata('privileges');
 		$this->session->sess_destroy();
 
 		$this->output->set_header('Location: '.base_url());
@@ -484,6 +495,106 @@ class Admin extends CI_Controller {
 			$this->output->set_header('Location: '.base_url());
 		}
 	}
+	
+	/* User */
+	
+	function user_list() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("User_role_model");
+		
+		if($this->session->userdata('login')) {
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("CREATE_USER", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}
+			
+			$data['users'] = $this->User_role_model->getUsers();
+			$header_data['menu'] = "user";
+			
+			$this->load->view('admin/header',$header_data);	
+			$this->load->view('admin/user_list',$data);
+		}
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function user_add() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("User_role_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$data['error'] = $this->input->get('error');
+			$data['action'] = "user_addto"; 
+			$data['roles'] = $this->User_role_model->getRoles();
+			
+			$header_data['menu'] = "user";
+			
+			$this->load->view('admin/header',$header_data);	
+			$this->load->view('admin/user_add',$data);
+		} else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function user_addto() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("User_role_model");
+		$this->load->model("Admin_model");
+		
+		if($this->session->userdata('login')) {
+			
+			$data = NULL;
+			
+			$login = $this->input->post('login');
+			$password = $this->input->post('password');
+			$password_conf = $this->input->post('password_conf');
+			$role = $this->input->post('role');
+			$email = $this->input->post('email');
+			
+			
+			if($login=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=login'));
+			}
+			else if($this->Admin_model->check_for_user($login)!=-1) {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=login'));
+			}
+			else if($password=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=password'));
+			}
+			else if($password_conf=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=password_conf'));
+			}
+			else if($password!=$password_conf) {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=password'));
+			}
+			else if($role=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=role'));
+			}
+			else if($email=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_add?error=email'));
+			}
+			else{
+				$this->User_role_model->addUser($login, $password, $role, $email);
+				$this->output->set_header('Location: '.site_url('admin/user_list'));
+			}
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
 	
 	/* Settings */
 	

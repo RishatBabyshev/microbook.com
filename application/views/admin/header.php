@@ -43,7 +43,7 @@ tinyMCE.init({
     <div class="title"><a href="#">Adminka</a></div>
     
     <div class="header_right">Welcome Admin, 
-		<a href="#" class="settings">Settings</a> 
+		<a href="<?php echo site_url('admin/settings');?>" class="settings">Settings</a> 
 		<a href="<?php echo site_url('admin/logout');?>" class="logout">Logout</a> 
 	</div>
     
@@ -52,7 +52,7 @@ tinyMCE.init({
     <li><a href="<?php echo site_url('admin/main');?>" <?php if($menu=="main") echo 'class="selected"';?>>Main page</a></li>
     <li><a href="<?php echo site_url('admin/category_list');?>" <?php if($menu=="category") echo 'class="selected"';?>>Categories</a></li>
     <li><a href="<?php echo site_url('admin/article_list');?>" <?php if($menu=="article") echo 'class="selected"';?>>Articles</a></li>
-    <li><a href="#" <?php if($menu=="user") echo 'class="selected"';?>>Users</a></li>
+    <li><a href="<?php echo site_url('admin/user_list');?>" <?php if($menu=="user") echo 'class="selected"';?>>Users</a></li>
     <li><a href="<?php echo site_url('admin/settings');?>" <?php if($menu=="settings") echo 'class="selected"';?>>Settings</a></li>
     <li><a href="#" <?php if($menu=="help") echo 'class="selected"';?>>Help</a></li>
     </ul>
