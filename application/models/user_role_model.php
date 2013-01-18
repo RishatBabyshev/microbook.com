@@ -6,6 +6,22 @@ class User_role_model extends CI_Model {
         parent::__construct();
     }
 
+	function getUser($user_id) {
+		$this->load->database();
+			
+		$sql = "SELECT * ".
+				"FROM user ".
+				"WHERE id = ".$user_id.";";
+		
+		$query = $this->db->query( $sql );
+		if ($query->num_rows() > 0) {
+			return $query->row();
+		}
+		else {
+			return NULL;
+		}
+	}
+	
 	function getUsers() {
 		$this->load->database();
 			
@@ -47,6 +63,30 @@ class User_role_model extends CI_Model {
 				VALUES ( ?, ?, ?, ? );";
 		
 		$query = $this->db->query( $sql, array($login, $password, $role, $email));
+		
+		return true;
+	}
+	
+	function editUser($id, $login, $password, $role, $email) {
+		$this->load->database();
+		
+		$sql = "UPDATE user  
+				SET login = ?, password = ?, role_id = ?, email = ?
+				WHERE id = ".$id.";";
+		
+		$query = $this->db->query( $sql, array($login, $password, $role, $email));
+		
+		return true;
+	}
+
+	function deleteUser($user_id) {
+		$this->load->database();
+		
+		$sql = "DELETE ".
+				"FROM user ". 
+				"WHERE id=".$user_id.";";
+		
+		$query = $this->db->query( $sql );
 		
 		return true;
 	}

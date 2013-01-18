@@ -595,6 +595,92 @@ class Admin extends CI_Controller {
 		}
 	}
 	
+	function user_edit($user_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("User_role_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$data['error'] = $this->input->get('error');
+			$data['user'] = $this->User_role_model->getUser($user_id);
+			$data['action'] = "user_editto"; 
+			$data['roles'] = $this->User_role_model->getRoles();
+			
+			$header_data['menu'] = "user";
+			
+			$this->load->view('admin/header',$header_data);		
+			$this->load->view('admin/user_add',$data);
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function user_editto() {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("Admin_model");
+		$this->load->model("User_role_model");
+		
+		if($this->session->userdata('login')) {
+		
+			$id = $this->input->post('id');
+			$login = $this->input->post('login');
+			$password = $this->input->post('password');
+			$password_conf = $this->input->post('password_conf');
+			$role = $this->input->post('role');
+			$email = $this->input->post('email');
+			
+			$user_login = $this->User_role_model->getUser($id)->login;
+			
+			$data = NULL;
+			
+			if($login=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=login'));
+			}
+			else if($login!=$user_login && $this->Admin_model->check_for_user($login)!=-1) {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=login'));
+			}
+			else if($password=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=password'));
+			}
+			else if($password_conf=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=password_conf'));
+			}
+			else if($password!=$password_conf) {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=password'));
+			}
+			else if($role=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=role'));
+			}
+			else if($email=="") {
+				$this->output->set_header('Location: '.site_url('admin/user_edit/'.$id.'?error=email'));
+			}
+			else{
+				$this->User_role_model->editUser($id, $login, $password, $role, $email);
+				$this->output->set_header('Location: '.site_url('admin/user_list'));
+			}
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
+	
+	function user_delete($user_id) {
+		$this->load->library('session');
+		$this->load->helper('url');
+		$this->load->model("User_role_model");
+		
+		if($this->session->userdata('login')) {
+			$this->User_role_model->deleteUser($user_id);
+			
+			$this->output->set_header('Location: '.site_url('admin/user_list'));
+		} 
+		else {
+			$this->output->set_header('Location: '.base_url());
+		}
+	}
 	
 	/* Settings */
 	
