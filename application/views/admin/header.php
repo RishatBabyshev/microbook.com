@@ -42,7 +42,7 @@ tinyMCE.init({
 	<div class="header">
     <div class="title"><a href="#">Adminka</a></div>
     
-    <div class="header_right">Welcome Admin, 
+    <div class="header_right">Welcome <?php echo $this->session->userdata('login');?>, 
 		<a href="<?php echo site_url('admin/settings');?>" class="settings">Settings</a> 
 		<a href="<?php echo site_url('admin/logout');?>" class="logout">Logout</a> 
 	</div>

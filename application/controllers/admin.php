@@ -96,15 +96,30 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-		
-			$data['error'] = $this->input->get('error');
-			$data['categories'] = $this->Admin_model->getListOfCategories();
-			$data['action'] = "article_addto"; 
 			
-			$header_data['menu'] = "article";
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("ADD_ARTICLE", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['error'] = $this->input->get('error');
+				$data['categories'] = $this->Admin_model->getListOfCategories();
+				$data['action'] = "article_addto"; 
+				
+				$header_data['menu'] = "article";
+				
+				$this->load->view('admin/header',$header_data);	
+				$this->load->view('admin/article_add',$data);
+			}
 			
-			$this->load->view('admin/header',$header_data);	
-			$this->load->view('admin/article_add',$data);
 		} else {
 			$this->output->set_header('Location: '.base_url());
 		}
@@ -150,16 +165,31 @@ class Admin extends CI_Controller {
 		
 		if($this->session->userdata('login')) {
 		
-			$data['error'] = $this->input->get('error');
-			$data['categories'] = $this->Admin_model->getListOfCategories();
-			$data['article'] = $this->Admin_model->getArticle($article_id, $lang);
-			$data['action'] = "article_editto"; 
-			$data['lang'] = $lang; 
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_ARTICLE", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {				
+				$data['error'] = $this->input->get('error');
+				$data['categories'] = $this->Admin_model->getListOfCategories();
+				$data['article'] = $this->Admin_model->getArticle($article_id, $lang);
+				$data['action'] = "article_editto"; 
+				$data['lang'] = $lang; 
+				
+				$header_data['menu'] = "article";
+				
+				$this->load->view('admin/header',$header_data);		
+				$this->load->view('admin/article_add',$data);
+			}
 			
-			$header_data['menu'] = "article";
-			
-			$this->load->view('admin/header',$header_data);		
-			$this->load->view('admin/article_add',$data);
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -222,16 +252,32 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-			// Get article information
-			$article = $this->Admin_model->getArticle($article_id, "en");
 			
-			// Get Category
-			$category_id = $article->category_id;
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("DELETE_ARTICLE", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				// Get article information
+				$article = $this->Admin_model->getArticle($article_id, "en");
+				
+				// Get Category
+				$category_id = $article->category_id;
+				
+				$this->Admin_model->deleteArticle($article_id);
+				$reorder = $this->Admin_model->sortasc($category_id);
+				
+				$this->output->set_header('Location: '.site_url('admin/article_list'));
+			}
 			
-			$this->Admin_model->deleteArticle($article_id);
-			$reorder = $this->Admin_model->sortasc($category_id);
-			
-			$this->output->set_header('Location: '.site_url('admin/article_list'));
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -244,27 +290,43 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-			// Get article information
-			$article = $this->Admin_model->getArticle($article_id, "en");
 			
-			// Get Category
-			$category_id = $article->category_id;
-			
-			// Get Order
-			$my_order = $article->my_order;
-			
-			// Amount of articles
-			$amount_of_articles = $this->Admin_model->getAmountOfArticlesInCategory($category_id);
-			
-			if($my_order!=$amount_of_articles) {
-				// Another Article
-				$my_order_up = $article->my_order+1;
-				$article_up = $this->Admin_model->getArticleByOrder($my_order_up, $category_id);
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_ARTICLE", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {	
+				// Get article information
+				$article = $this->Admin_model->getArticle($article_id, "en");
 				
-				$this->Admin_model->changeOrderOfArticles($article->id, $my_order_up, $article_up->id, $my_order);
+				// Get Category
+				$category_id = $article->category_id;
+				
+				// Get Order
+				$my_order = $article->my_order;
+				
+				// Amount of articles
+				$amount_of_articles = $this->Admin_model->getAmountOfArticlesInCategory($category_id);
+				
+				if($my_order!=$amount_of_articles) {
+					// Another Article
+					$my_order_up = $article->my_order+1;
+					$article_up = $this->Admin_model->getArticleByOrder($my_order_up, $category_id);
+					
+					$this->Admin_model->changeOrderOfArticles($article->id, $my_order_up, $article_up->id, $my_order);
+				}
+				
+				$this->output->set_header('Location: '.site_url('admin/article_list'));		
 			}
 			
-			$this->output->set_header('Location: '.site_url('admin/article_list'));		
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -277,24 +339,40 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-			// Get article information
-			$article = $this->Admin_model->getArticle($article_id, "en");
 			
-			// Get Category
-			$category_id = $article->category_id;
-			
-			// Get Order
-			$my_order = $article->my_order;
-			
-			if($my_order!=1) {			
-				// Another Article
-				$my_order_down = $article->my_order-1;
-				$article_down = $this->Admin_model->getArticleByOrder($my_order_down, $category_id);
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_ARTICLE", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {	
+				// Get article information
+				$article = $this->Admin_model->getArticle($article_id, "en");
 				
-				$this->Admin_model->changeOrderOfArticles($article->id, $my_order_down, $article_down->id, $my_order);
+				// Get Category
+				$category_id = $article->category_id;
+				
+				// Get Order
+				$my_order = $article->my_order;
+				
+				if($my_order!=1) {			
+					// Another Article
+					$my_order_down = $article->my_order-1;
+					$article_down = $this->Admin_model->getArticleByOrder($my_order_down, $category_id);
+					
+					$this->Admin_model->changeOrderOfArticles($article->id, $my_order_down, $article_down->id, $my_order);
+				}
+				
+				$this->output->set_header('Location: '.site_url('admin/article_list'));	
 			}
 			
-			$this->output->set_header('Location: '.site_url('admin/article_list'));		
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -327,14 +405,29 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-		
-			$data['error'] = $this->input->get('error');
-			$data['action'] = "category_addto"; 
 			
-			$header_data['menu'] = "category";
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("ADD_CATEGORY", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['error'] = $this->input->get('error');
+				$data['action'] = "category_addto"; 
+				
+				$header_data['menu'] = "category";
+				
+				$this->load->view('admin/header',$header_data);	
+				$this->load->view('admin/category_add',$data);
+			}
 			
-			$this->load->view('admin/header',$header_data);	
-			$this->load->view('admin/category_add',$data);
 		} else {
 			$this->output->set_header('Location: '.base_url());
 		}
@@ -378,14 +471,29 @@ class Admin extends CI_Controller {
 		
 		if($this->session->userdata('login')) {
 		
-			$data['error'] = $this->input->get('error');
-			$data['category'] = $this->Admin_model->getCategory($category_id);
-			$data['action'] = "category_editto"; 
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_CATEGORY", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['error'] = $this->input->get('error');
+				$data['category'] = $this->Admin_model->getCategory($category_id);
+				$data['action'] = "category_editto"; 
+				
+				$header_data['menu'] = "category";
+				
+				$this->load->view('admin/header',$header_data);		
+				$this->load->view('admin/category_add',$data);
+			}
 			
-			$header_data['menu'] = "category";
-			
-			$this->load->view('admin/header',$header_data);		
-			$this->load->view('admin/category_add',$data);
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -429,10 +537,26 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-			$this->Admin_model->deleteCategory($category_id);
-			$reorder = $this->Admin_model->sortascCategory();
 			
-			$this->output->set_header('Location: '.site_url('admin/category_list'));
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("DELETE_CATEGORY", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$this->Admin_model->deleteCategory($category_id);
+				$reorder = $this->Admin_model->sortascCategory();
+				
+				$this->output->set_header('Location: '.site_url('admin/category_list'));
+			}
+			
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -445,24 +569,40 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-			// Get category information
-			$category = $this->Admin_model->getCategory($category_id);
 			
-			// Get Order
-			$my_order = $category->my_order;
-			
-			// Amount of categories
-			$amount_of_categories = $this->Admin_model->getAmountOfCategories();
-			
-			if($my_order!=$amount_of_categories) {
-				// Another Category
-				$my_order_up = $category->my_order+1;
-				$category_up = $this->Admin_model->getCategoryByOrder($my_order_up);
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_CATEGORY", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				// Get category information
+				$category = $this->Admin_model->getCategory($category_id);
 				
-				$this->Admin_model->changeOrderOfCategories($category->id, $my_order_up, $category_up->id, $my_order);
+				// Get Order
+				$my_order = $category->my_order;
+				
+				// Amount of categories
+				$amount_of_categories = $this->Admin_model->getAmountOfCategories();
+				
+				if($my_order!=$amount_of_categories) {
+					// Another Category
+					$my_order_up = $category->my_order+1;
+					$category_up = $this->Admin_model->getCategoryByOrder($my_order_up);
+					
+					$this->Admin_model->changeOrderOfCategories($category->id, $my_order_up, $category_up->id, $my_order);
+				}
+				
+				$this->output->set_header('Location: '.site_url('admin/category_list'));		
 			}
 			
-			$this->output->set_header('Location: '.site_url('admin/category_list'));		
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -475,21 +615,37 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-			// Get category information
-			$category = $this->Admin_model->getCategory($category_id);
 			
-			// Get Order
-			$my_order = $category->my_order;
-			
-			if($my_order!=1) {			
-				// Another Category
-				$my_order_down = $category->my_order-1;
-				$category_down = $this->Admin_model->getCategoryByOrder($my_order_down);
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_CATEGORY", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				// Get category information
+				$category = $this->Admin_model->getCategory($category_id);
 				
-				$this->Admin_model->changeOrderOfCategories($category->id, $my_order_down, $category_down->id, $my_order);
+				// Get Order
+				$my_order = $category->my_order;
+				
+				if($my_order!=1) {			
+					// Another Category
+					$my_order_down = $category->my_order-1;
+					$category_down = $this->Admin_model->getCategoryByOrder($my_order_down);
+					
+					$this->Admin_model->changeOrderOfCategories($category->id, $my_order_down, $category_down->id, $my_order);
+				}
+				
+				$this->output->set_header('Location: '.site_url('admin/category_list'));		
 			}
 			
-			$this->output->set_header('Location: '.site_url('admin/category_list'));		
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -504,8 +660,10 @@ class Admin extends CI_Controller {
 		$this->load->model("User_role_model");
 		
 		if($this->session->userdata('login')) {
+			
+			/* Check for privilege */
 			$privileges = $this->session->userdata('privileges');
-			if(!in_array("CREATE_USER", $privileges)){
+			if(!in_array("ADD_USER", $privileges)){
 				$url;
 				if(ISSET($_SERVER['HTTP_REFERER'])){
 					$url = $_SERVER['HTTP_REFERER'];
@@ -514,13 +672,15 @@ class Admin extends CI_Controller {
 					$url = site_url('admin/main');
 				}
 				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['users'] = $this->User_role_model->getUsers();
+				$header_data['menu'] = "user";
+				
+				$this->load->view('admin/header',$header_data);	
+				$this->load->view('admin/user_list',$data);
 			}
 			
-			$data['users'] = $this->User_role_model->getUsers();
-			$header_data['menu'] = "user";
-			
-			$this->load->view('admin/header',$header_data);	
-			$this->load->view('admin/user_list',$data);
 		}
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -533,15 +693,30 @@ class Admin extends CI_Controller {
 		$this->load->model("User_role_model");
 		
 		if($this->session->userdata('login')) {
-		
-			$data['error'] = $this->input->get('error');
-			$data['action'] = "user_addto"; 
-			$data['roles'] = $this->User_role_model->getRoles();
 			
-			$header_data['menu'] = "user";
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("ADD_USER", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['error'] = $this->input->get('error');
+				$data['action'] = "user_addto"; 
+				$data['roles'] = $this->User_role_model->getRoles();
+				
+				$header_data['menu'] = "user";
+				
+				$this->load->view('admin/header',$header_data);	
+				$this->load->view('admin/user_add',$data);
+			}
 			
-			$this->load->view('admin/header',$header_data);	
-			$this->load->view('admin/user_add',$data);
 		} else {
 			$this->output->set_header('Location: '.base_url());
 		}
@@ -601,16 +776,31 @@ class Admin extends CI_Controller {
 		$this->load->model("User_role_model");
 		
 		if($this->session->userdata('login')) {
-		
-			$data['error'] = $this->input->get('error');
-			$data['user'] = $this->User_role_model->getUser($user_id);
-			$data['action'] = "user_editto"; 
-			$data['roles'] = $this->User_role_model->getRoles();
 			
-			$header_data['menu'] = "user";
-			
-			$this->load->view('admin/header',$header_data);		
-			$this->load->view('admin/user_add',$data);
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("ADD_USER", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['error'] = $this->input->get('error');
+				$data['user'] = $this->User_role_model->getUser($user_id);
+				$data['action'] = "user_editto"; 
+				$data['roles'] = $this->User_role_model->getRoles();
+				
+				$header_data['menu'] = "user";
+				
+				$this->load->view('admin/header',$header_data);		
+				$this->load->view('admin/user_add',$data);
+			}	
+				
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -673,9 +863,25 @@ class Admin extends CI_Controller {
 		$this->load->model("User_role_model");
 		
 		if($this->session->userdata('login')) {
-			$this->User_role_model->deleteUser($user_id);
 			
-			$this->output->set_header('Location: '.site_url('admin/user_list'));
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("DELETE_USER", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$this->User_role_model->deleteUser($user_id);
+				
+				$this->output->set_header('Location: '.site_url('admin/user_list'));
+			}
+			
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());
@@ -690,17 +896,32 @@ class Admin extends CI_Controller {
 		$this->load->model("Admin_model");
 		
 		if($this->session->userdata('login')) {
-		
-			$data['error'] = $this->input->get('error');
 			
-			$settings = $this->Admin_model->getSettings();
-			$data['site_name'] = $settings[0]->name;
-			$data['offline'] = $settings[0]->offline;
+			/* Check for privilege */
+			$privileges = $this->session->userdata('privileges');
+			if(!in_array("EDIT_GLOBAL_SETTINGS", $privileges)){
+				$url;
+				if(ISSET($_SERVER['HTTP_REFERER'])){
+					$url = $_SERVER['HTTP_REFERER'];
+				}
+				else {
+					$url = site_url('admin/main');
+				}
+				$this->output->set_header('Location: '.$url);
+			}/* End of check */
+			else {
+				$data['error'] = $this->input->get('error');
+				
+				$settings = $this->Admin_model->getSettings();
+				$data['site_name'] = $settings[0]->name;
+				$data['offline'] = $settings[0]->offline;
+				
+				$header_data['menu'] = "settings";
+				
+				$this->load->view('admin/header',$header_data);	
+				$this->load->view('admin/settings', $data);
+			}
 			
-			$header_data['menu'] = "settings";
-			
-			$this->load->view('admin/header',$header_data);	
-			$this->load->view('admin/settings', $data);
 		} 
 		else {
 			$this->output->set_header('Location: '.base_url());

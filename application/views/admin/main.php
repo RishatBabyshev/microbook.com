@@ -38,7 +38,7 @@
 				</div>
 				<div class="icon-wrapper">
 					<div class="icon">
-						<a href="#">
+						<a href="<?php echo site_url('admin/user_list');?>">
 							<img src="<?php echo base_url();?>images/quick-icon/user.png" alt="">
 							<span>User Manager</span>
 						</a>
